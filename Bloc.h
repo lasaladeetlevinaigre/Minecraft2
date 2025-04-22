@@ -1,26 +1,32 @@
-#ifndef BLOC_H
-#define BLOC_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
-class Map;
-
 class Bloc {
-private:
-    int x_, y_;
-    sf::Color color_;
-
+	sf::Color color_;
+	int x_;
+	int  y_;
 public:
-    Bloc(int x, int y, const sf::Color& color)
-        : x_(x), y_(y), color_(color) {}
+	Bloc(int x, int y, sf::Color color) : color_(color), x_(x), y_(y) {}
 
-    virtual ~Bloc() = default;  // Destructeur virtuel
+	void setX(int x) { x_ = x; }
+	void setY(int y) { y_ = y; }
 
-    virtual void update(Map& map) = 0;
-    void draw(sf::RenderWindow& window, float cellSize) const;
+	void draw(sf::RenderWindow& window, int blockSize) const {
+		sf::RectangleShape rectangle(sf::Vector2f(blockSize, blockSize));
+		rectangle.setPosition(x_ * blockSize, y_ * blockSize);
+		rectangle.setFillColor(color_);
+		window.draw(rectangle);
+	}
 
-	int getX() const { return x_; }
-	int getY() const { return y_; }
+	// Déplacement et mise à jour du bloc
+	void update(Map& map) {
+		if (map.inBounds(x_, y_ + 1) && !map.getBlock(x_, y_ + 1)) {
+			y_ += 1;
+			map.setBlocInNextFrame(x_, y_, this);
+		} else {
+			// Si le bloc ne bouge pas, le recopier tel quel dans la nouvelle frame
+			map.setBlocInNextFrame(x_, y_, this);
+		}
+	}
 };
-
-#endif // !BLOC_H

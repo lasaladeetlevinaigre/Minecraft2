@@ -10,7 +10,9 @@ class Game
 	int fps_, tps_;
 	float speed_;
 	int frameCount_;
+
 	int width_, height_;
+	int blockSize_;
 
 	Map* map_;
 

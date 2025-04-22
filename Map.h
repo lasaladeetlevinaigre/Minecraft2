@@ -17,15 +17,19 @@ private:
 
 
 public:
-	Map();
+	Map(int screenWidth, int screenHeight, int blockSize);
 	~Map();
 	void initGrid();
 	void update();
 	void draw(sf::RenderWindow& window) const;
-	void setBloc(int x, int y, Bloc* block);
+	void setBlocInNextFrame(int x, int y, Bloc* bloc);
+	void setBlocInCurrentFrame(int x, int y, Bloc* bloc);
 	Bloc* getBlock(int x, int y);
 	bool inBounds(int x, int y) const;
 	void swapGrids();
+
+	int getWidth() const { return width_; }
+	int getHeight() const { return height_; }
 };
 
 
