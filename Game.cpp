@@ -1,12 +1,14 @@
 #include "Game.h"
 #include "Map.h"
 #include "Bloc.h"
+#include "Menu.h"
 
-Game::Game() : fps_(60), tps_(20), speed_(1.0f), frameCount_(0), width_(1600), height_(900), blockSize_(5), isRunning_(true)
+Game::Game() : fps_(60), tps_(20), speed_(1.0f), frameCount_(0), width_(1600), height_(900), uiWidth_(200), blockSize_(10), isRunning_(false)
 {
 	window_.create(sf::VideoMode(width_, height_), "Minecraft2");
 	window_.setFramerateLimit(fps_);
-	map_ = new Map(width_, height_, blockSize_);
+	map_ = new Map(width_ - uiWidth_, height_, blockSize_);
+	menu_ = new Menu(this, map_, uiWidth_);
 }
 
 
@@ -34,6 +36,10 @@ void Game::handleEvents()
 	sf::Event event;
 	while (window_.pollEvent(event))
 	{
+
+		menu_->handleEvent(event, window_);
+
+		/*
 		if (event.type == sf::Event::Closed) {
 			std::cout << "Game closed" << std::endl;
 			isRunning_ = false;
@@ -69,8 +75,7 @@ void Game::handleEvents()
 					std::cout << "Invalid position for sand block: (" << x << ", " << y << ")" << std::endl;
 				}
 			}
-		}
-		//menu_->handlEvents(event);
+		}*/
 	}
 }
 void Game::update()
@@ -81,7 +86,7 @@ void Game::update()
 void Game::render()
 {
 	window_.clear(sf::Color::Black);
+	menu_->drawUI(window_);
 	map_->draw(window_);
-	//menu_->drawUI();
 	window_.display();
 }

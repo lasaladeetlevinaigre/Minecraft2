@@ -15,6 +15,7 @@ private:
     std::vector<std::vector<Bloc*>> currentGrid_;
     std::vector<std::vector<Bloc*>> nextGrid_;
 
+	int nbBlocks_;
 
 public:
 	Map(int screenWidth, int screenHeight, int blockSize);
@@ -30,6 +31,8 @@ public:
 
 	int getWidth() const { return width_; }
 	int getHeight() const { return height_; }
+
+	int getNbBlocks() const { return nbBlocks_; }
 };
 
 

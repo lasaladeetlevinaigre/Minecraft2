@@ -2,7 +2,7 @@
 #include "Bloc.h"  // Inclusion complète ici
 
 Map::Map(int screenWidth, int screenHeight, int blockSize)
-	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize) {
+	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize), nbBlocks_(0){
 	initGrid();
 }
 
@@ -23,7 +23,7 @@ void Map::initGrid() {
 	currentGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
 	nextGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
 
-	currentGrid_[20][20] = new Bloc(20, 20, sf::Color::Red);
+	currentGrid_[20][20] = new Bloc(20, 20, sf::Color::Red); // BLOC DE TEST
 }
 
 int countNonNulBlocks(const std::vector<std::vector<Bloc*>>& grid) {
@@ -86,16 +86,16 @@ bool Map::inBounds(int x, int y) const {
 void Map::swapGrids() {
 
 	// Nettoyage de currentGrid_
-	int nb = 0;
+	nbBlocks_ = 0;
 	for (auto& row : currentGrid_) {
 		for (auto& block : row) {
 			if(block)
-				nb++;
+				nbBlocks_++;
 			block = nullptr; // pas de fuite mémoire si on a bien gérer la création de nextGrid
 		}
 	}
 	std::vector<std::vector<Bloc*>> temp = currentGrid_;
 	currentGrid_ = nextGrid_;
 	nextGrid_ = temp;
-	std::cout << nb << " blocks on grid" << std::endl;
+	std::cout << nbBlocks_ << " blocks on grid" << std::endl;
 }
