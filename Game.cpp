@@ -15,6 +15,7 @@ Game::Game() : fps_(60), tps_(20), speed_(1.0f), frameCount_(0), width_(1600), h
 Game::~Game()
 {
 	delete map_;
+	delete menu_;
 }
 
 void Game::run()
@@ -25,7 +26,7 @@ void Game::run()
 		if (isRunning_)
 		{
 			frameCount_++;
-			std::cout << frameCount_ << std::endl;
+			//std::cout << frameCount_ << std::endl;
 			update();
 		}
 		render();
@@ -38,44 +39,6 @@ void Game::handleEvents()
 	{
 
 		menu_->handleEvent(event, window_);
-
-		/*
-		if (event.type == sf::Event::Closed) {
-			std::cout << "Game closed" << std::endl;
-			isRunning_ = false;
-			window_.close();
-		}
-		if (event.type == sf::Event::KeyPressed)
-		{
-			if (event.key.code == sf::Keyboard::Escape) {
-				std::cout << "Game closed" << std::endl;
-				isRunning_ = false;
-				window_.close();
-			}
-			if (event.key.code == sf::Keyboard::Space)
-			{
-				if (isRunning_) {
-					std::cout << "Game paused" << std::endl;
-					isRunning_ = false;
-				}
-				else {
-					std::cout << "Game resumed" << std::endl;
-					isRunning_ = true;
-				}
-			}
-			if (event.key.code == sf::Keyboard::S) {
-				// summon sand block
-				int x = rand() % map_->getWidth();
-				int y = rand() % map_->getHeight();
-				if (map_->inBounds(x, y)) {
-					map_->setBlocInCurrentFrame(x, y, new Bloc(x, y, sf::Color::Yellow));
-					std::cout << "Summoned sand block at (" << x << ", " << y << ")" << std::endl;
-				}
-				else {
-					std::cout << "Invalid position for sand block: (" << x << ", " << y << ")" << std::endl;
-				}
-			}
-		}*/
 	}
 }
 void Game::update()

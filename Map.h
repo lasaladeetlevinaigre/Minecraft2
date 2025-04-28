@@ -15,24 +15,22 @@ private:
     std::vector<std::vector<Bloc*>> currentGrid_;
     std::vector<std::vector<Bloc*>> nextGrid_;
 
-	int nbBlocks_;
-
 public:
 	Map(int screenWidth, int screenHeight, int blockSize);
 	~Map();
-	void initGrid();
 	void update();
 	void draw(sf::RenderWindow& window) const;
 	void setBlocInNextFrame(int x, int y, Bloc* bloc);
 	void setBlocInCurrentFrame(int x, int y, Bloc* bloc);
+	void removeBloc(int x, int y);
+	void clear();
 	Bloc* getBlock(int x, int y);
 	bool inBounds(int x, int y) const;
-	void swapGrids();
 
 	int getWidth() const { return width_; }
 	int getHeight() const { return height_; }
+	int getBlockSize() const { return blockSize_; }
 
-	int getNbBlocks() const { return nbBlocks_; }
 };
 
 

@@ -28,21 +28,13 @@ private:
 
     void createButtons(); // en interne
 
+    bool isDrawingNow_;
+	int brushRadius_;
+
 public:
     Menu(Game* game, Map* map, int uiWidth);
 
     void drawUI(sf::RenderWindow& window) const;
 
     void handleEvent(const sf::Event& event, sf::RenderWindow& window);
-
-    void toggleRunning();
-	void summonRandomSand();
-
-    // Accès/modification de l’état
-	MenuState getState() const {
-		return state_;
-	}
-	void setState(MenuState newState) {
-		state_ = newState;
-	}
 };

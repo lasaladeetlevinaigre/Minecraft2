@@ -2,8 +2,12 @@
 #include "Bloc.h"  // Inclusion complète ici
 
 Map::Map(int screenWidth, int screenHeight, int blockSize)
-	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize), nbBlocks_(0){
-	initGrid();
+	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize) {
+
+	// Initialisation de la grille
+	std::cout << "Map dimensions : " << width_ << " x " << height_ << std::endl;
+	currentGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
+	nextGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
 }
 
 Map::~Map() {
@@ -18,28 +22,9 @@ Map::~Map() {
 		}
 	}
 }
-void Map::initGrid() {
-	std::cout << "Map dimensions : " << width_ << " x " << height_ << std::endl;
-	currentGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
-	nextGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
-
-	currentGrid_[20][20] = new Bloc(20, 20, sf::Color::Red); // BLOC DE TEST
-}
-
-int countNonNulBlocks(const std::vector<std::vector<Bloc*>>& grid) {
-	int count = 0;
-	for (const auto& row : grid) {
-		for (const auto& block : row) {
-			if (block != nullptr) {
-				count++;
-			}
-		}
-	}
-	return count;
-}
-
 
 void Map::update() {
+	// Parcours de la grille du bas vers le haut
 	for (int y = height_ - 1; y >= 0; --y) {
 		for (int x = 0; x < width_; ++x) {
 
@@ -49,7 +34,20 @@ void Map::update() {
 		}
 	}
 
-	swapGrids();
+	// Nettoyage de currentGrid_
+	int nbBlocks = 0;
+	for (auto& row : currentGrid_) {
+		for (auto& block : row) {
+			if (block)
+				nbBlocks++;
+			block = nullptr; // pas de fuite mémoire si on a bien gérer la création de nextGrid
+		}
+	}
+
+	std::vector<std::vector<Bloc*>> temp = currentGrid_;
+	currentGrid_ = nextGrid_;
+	nextGrid_ = temp;
+	//std::cout << nbBlocks << " blocks on grid" << std::endl;
 }
 
 void Map::draw(sf::RenderWindow& window) const {
@@ -64,15 +62,38 @@ void Map::draw(sf::RenderWindow& window) const {
 
 void Map::setBlocInCurrentFrame(int x, int y, Bloc* block) {
 	if (inBounds(x, y)) {
+		if (currentGrid_[y][x]) {
+			delete currentGrid_[y][x]; // Libération de la mémoire
+		}
 		currentGrid_[y][x] = block;
 	}
 }
 
 void Map::setBlocInNextFrame(int x, int y, Bloc* block) {
 	if (inBounds(x, y)) {
+		if (nextGrid_[y][x]) {
+			delete nextGrid_[y][x]; // Libération de la mémoire
+		}
 		nextGrid_[y][x] = block;
 	}
 }
+void Map::removeBloc(int x, int y) {
+	if (inBounds(x, y)) {
+		delete currentGrid_[y][x]; // Libération de la mémoire
+		currentGrid_[y][x] = nullptr;
+	}
+}
+
+void Map::clear() {
+	for (int y = 0; y < height_; ++y) {
+		for (int x = 0; x < width_; ++x) {
+			delete currentGrid_[y][x]; // Libération de la mémoire
+			currentGrid_[y][x] = nullptr;
+		}
+	}
+}
+
+
 Bloc* Map::getBlock(int x, int y) {
 	if (inBounds(x, y)) {
 		return currentGrid_[y][x];
@@ -81,21 +102,4 @@ Bloc* Map::getBlock(int x, int y) {
 }
 bool Map::inBounds(int x, int y) const {
 	return x >= 0 && x < width_ && y >= 0 && y < height_;
-}
-
-void Map::swapGrids() {
-
-	// Nettoyage de currentGrid_
-	nbBlocks_ = 0;
-	for (auto& row : currentGrid_) {
-		for (auto& block : row) {
-			if(block)
-				nbBlocks_++;
-			block = nullptr; // pas de fuite mémoire si on a bien gérer la création de nextGrid
-		}
-	}
-	std::vector<std::vector<Bloc*>> temp = currentGrid_;
-	currentGrid_ = nextGrid_;
-	nextGrid_ = temp;
-	std::cout << nbBlocks_ << " blocks on grid" << std::endl;
 }

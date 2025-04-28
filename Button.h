@@ -11,7 +11,13 @@ enum class ButtonAction {
     SummonRandomSand,
     AddSandBloc,
     AddStoneBloc,
-    AddMushroomBloc
+    AddMushroomBloc,
+    RemoveBloc,
+	IncreaseBrushRadius,
+	DecreaseBrushRadius,
+	ClearMap,
+	SaveMap,
+	LoadMap
 };
 
 class Button {
@@ -65,4 +71,5 @@ public:
 			rect_.setFillColor(bgColor_[0]);
 		}
 	}
+    void setText(const std::string& text);
 };

@@ -47,6 +47,14 @@ Button::Button(ButtonAction action,
 	sfText_.setPosition(x_ + width_ / 2.0f, y_ + height_ / 2.0f);
 
 }
+void Button::setText(const std::string& text) {
+	text_ = text;
+	sfText_.setString(text);
+	sf::FloatRect textRect = sfText_.getLocalBounds();
+	sfText_.setOrigin(textRect.left + textRect.width / 2.0f,
+		textRect.top + textRect.height / 2.0f);
+	sfText_.setPosition(x_ + width_ / 2.0f, y_ + height_ / 2.0f);
+}
 
 bool Button::contains(int x, int y) const {
 	return (x >= x_ && x <= x_ + width_ && y >= y_ && y <= y_ + height_);
