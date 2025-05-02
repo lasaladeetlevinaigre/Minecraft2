@@ -17,7 +17,8 @@ enum class ButtonAction {
 	DecreaseBrushRadius,
 	ClearMap,
 	SaveMap,
-	LoadMap
+	LoadMap,
+	Quit
 };
 
 class Button {

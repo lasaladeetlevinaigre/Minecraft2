@@ -2,12 +2,24 @@
 
 #include <SFML/Graphics.hpp>
 
+class Map;
+
+enum BlocType{
+	STONE,
+	SAND,
+	MUSHROOM
+};
+
 class Bloc {
 	sf::Color color_;
 	int x_;
 	int  y_;
+	BlocType type_;
 public:
-	Bloc(int x, int y, sf::Color color) : color_(color), x_(x), y_(y) {}
+	Bloc(int x, int y, BlocType type, sf::Color color) : color_(color), type_(type), x_(x), y_(y) {}
+	virtual ~Bloc() {};
+
+	virtual void update(Map* map) = 0;
 
 	void setX(int x) { x_ = x; }
 	void setY(int y) { y_ = y; }
@@ -19,14 +31,11 @@ public:
 		window.draw(rectangle);
 	}
 
-	// Déplacement et mise à jour du bloc
-	void update(Map& map) {
-		if (map.inBounds(x_, y_ + 1) && !map.getBlock(x_, y_ + 1)) {
-			y_ += 1;
-			map.setBlocInNextFrame(x_, y_, this);
-		} else {
-			// Si le bloc ne bouge pas, le recopier tel quel dans la nouvelle frame
-			map.setBlocInNextFrame(x_, y_, this);
-		}
-	}
+	int getX() const { return x_; }
+	int getY() const { return y_; }
+	sf::Color getColor() const { return color_; }
+	BlocType getType() const { return type_; }
+
+
+
 };
