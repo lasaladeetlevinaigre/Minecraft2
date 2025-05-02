@@ -3,6 +3,7 @@
 #include "Bloc.h"
 
 class Sand : public Bloc {
-public :
-	void update();
+public:
+    Sand(int x, int y);
+    void update(Map& map);
 };
