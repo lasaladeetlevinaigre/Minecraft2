@@ -1,5 +1,8 @@
 #include "Map.h"
-#include "Bloc.h"  // Inclusion complète ici
+#include "Bloc.h"
+#include "Sand.h"
+#include "Stone.h"
+#include "Mushroom.h"
 
 Map::Map(int screenWidth, int screenHeight, int blockSize)
 	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize) {
@@ -29,7 +32,7 @@ void Map::update() {
 		for (int x = 0; x < width_; ++x) {
 
 			if (currentGrid_[y][x]) {
-				currentGrid_[y][x]->update(*this);
+				currentGrid_[y][x]->update(this);
 			}
 		}
 	}
@@ -38,16 +41,13 @@ void Map::update() {
 	int nbBlocks = 0;
 	for (auto& row : currentGrid_) {
 		for (auto& block : row) {
-			if (block)
-				nbBlocks++;
-			block = nullptr; // pas de fuite mémoire si on a bien gérer la création de nextGrid
+			block = nullptr; // pas de fuite mémoire si on a bien gérer la suppression des blocs 
 		}
 	}
 
 	std::vector<std::vector<Bloc*>> temp = currentGrid_;
 	currentGrid_ = nextGrid_;
 	nextGrid_ = temp;
-	//std::cout << nbBlocks << " blocks on grid" << std::endl;
 }
 
 void Map::draw(sf::RenderWindow& window) const {

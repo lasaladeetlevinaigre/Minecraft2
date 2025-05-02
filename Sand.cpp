@@ -1,23 +1,51 @@
 #include "Sand.h"
 #include "Map.h"
 
-Sand::Sand(int x, int y) : Bloc(x, y, sf::Color::Yellow) {}
+Sand::Sand(int x, int y) : Bloc(x, y, SAND, sf::Color::Yellow) {}
 
-void Sand::update(Map& map) {
-    Bloc* dessous = map.getBlock(x_, y_ + 1);
-    Bloc* dgauche = map.getBlock(x_ - 1, y_ + 1);
-    Bloc* ddroit = map.getBlock(x_ + 1, y_ + 1);
-    if (dessous == nullptr) {
-        map.setBlocInNextFrame(x_, y_ + 1,this);
-    }
-    else if (dgauche == nullptr) {
-        map.setBlocInNextFrame(x_ - 1, y_ + 1, this);
+
+
+void Sand::update(Map* map) {
+    int x = getX();
+    int y = getY();
+
+    // En dessous
+    if (map->inBounds(x, y + 1) && map->getBlock(x, y + 1) == nullptr) {
+        map->setBlocInNextFrame(x, y + 1, this);
+        setY(y + 1);
+        return;
     }
 
-    else if (ddroit == nullptr) {
-        map.setBlocInNextFrame(x_ + 1, y_ + 1, this);
+    // Choisir aléatoirement entre gauche et droite
+    bool canLeft = map->inBounds(x - 1, y + 1) && map->getBlock(x - 1, y + 1) == nullptr && map->getBlock(x - 1, y) == nullptr;
+    bool canRight = map->inBounds(x + 1, y + 1) && map->getBlock(x + 1, y + 1) == nullptr && map->getBlock(x + 1, y) == nullptr;
+
+    if (canLeft && canRight) {
+        if (rand() % 2 == 0) {
+            map->setBlocInNextFrame(x - 1, y + 1, this);
+            setX(x - 1);
+            setY(y + 1);
+        }
+        else {
+            map->setBlocInNextFrame(x + 1, y + 1, this);
+            setX(x + 1);
+            setY(y + 1);
+        }
+        return;
     }
-    else {
-        map.setBlocInNextFrame(x_, y_, this);
+    else if (canLeft) {
+        map->setBlocInNextFrame(x - 1, y + 1, this);
+        setX(x - 1);
+        setY(y + 1);
+        return;
     }
+    else if (canRight) {
+        map->setBlocInNextFrame(x + 1, y + 1, this);
+        setX(x + 1);
+        setY(y + 1);
+        return;
+    }
+
+    // Sinon, reste en place
+    map->setBlocInNextFrame(x, y, this);
 }

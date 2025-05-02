@@ -2,6 +2,9 @@
 #include "Game.h"
 #include "Map.h"
 #include "Bloc.h"
+#include "Sand.h"
+#include "Stone.h"
+#include "Mushroom.h"
 #include <iostream>
 
 
@@ -155,14 +158,16 @@ void Menu::createButtons() {
 		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
 	y += 40;
 
-
-
-	
-
-		
-
-
-	
+	buttons_.push_back(Button(ButtonAction::Quit,
+		game_->getWidth() - uiWidth_ + 10, y,
+		uiWidth_ - 20, 30,
+		"Quit",
+		font_,
+		18,
+		sf::Color::White,
+		sf::Color::Black,
+		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
+	y += 40;
 
 }
 
@@ -186,7 +191,7 @@ void summonRandomSand(Map* map) {
 	int x = rand() % map->getWidth();
 	int y = rand() % map->getHeight();
 	if (map->inBounds(x, y)) {
-		map->setBlocInCurrentFrame(x, y, new Bloc(x, y, sf::Color::Yellow));
+		map->setBlocInCurrentFrame(x, y, new Sand(x, y));
 		//std::cout << "Summoned sand block at (" << x << ", " << y << ")" << std::endl;
 	}
 }
@@ -241,7 +246,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 					for (int i = -brushRadius_; i <= brushRadius_; ++i) {
 						for (int j = -brushRadius_; j <= brushRadius_; ++j) {
 							if (map_->inBounds(x + i, y + j)) {
-								map_->setBlocInCurrentFrame(x + i, y + j, new Bloc(x + i, y + j, sf::Color::Yellow));
+								map_->setBlocInCurrentFrame(x + i, y + j, new Sand(x + i, y + j));
 							}
 						}
 					}
@@ -252,7 +257,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 					for (int i = -brushRadius_; i <= brushRadius_; ++i) {
 						for (int j = -brushRadius_; j <= brushRadius_; ++j) {
 							if (map_->inBounds(x + i, y + j)) {
-								map_->setBlocInCurrentFrame(x + i, y + j, new Bloc(x + i, y + j, sf::Color(150, 150, 150)));
+								map_->setBlocInCurrentFrame(x + i, y + j, new Stone(x + i, y + j));
 							}
 						}
 					}
@@ -263,7 +268,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 					for (int i = -brushRadius_; i <= brushRadius_; ++i) {
 						for (int j = -brushRadius_; j <= brushRadius_; ++j) {
 							if (map_->inBounds(x + i, y + j)) {
-								map_->setBlocInCurrentFrame(x + i, y + j, new Bloc(x + i, y + j, sf::Color(255, 0, 255)));
+								map_->setBlocInCurrentFrame(x + i, y + j, new Mushroom(x + i, y + j, 15));
 							}
 						}
 					}
@@ -422,6 +427,11 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 								b.setSelected(false);
 						}
 						break;
+					case ButtonAction::Quit:
+						std::cout << "Game closed" << std::endl;
+						game_->setRunning(false);
+						window.close();
+						return;
 				}
 			}
 		}

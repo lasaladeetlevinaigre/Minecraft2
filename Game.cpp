@@ -3,7 +3,7 @@
 #include "Bloc.h"
 #include "Menu.h"
 
-Game::Game() : fps_(60), tps_(20), speed_(1.0f), frameCount_(0), width_(1600), height_(900), uiWidth_(200), blockSize_(10), isRunning_(false)
+Game::Game() : fps_(60), tps_(20), speed_(1.0f), frameCount_(0), width_(1600), height_(900), uiWidth_(200), blockSize_(5), isRunning_(false)
 {
 	window_.create(sf::VideoMode(width_, height_), "Minecraft2");
 	window_.setFramerateLimit(fps_);
