@@ -5,7 +5,8 @@
 class Mushroom : public Bloc {
     int spreadCooldown_;
     int initialCooldown_;
+    bool hooked_;
 public:
-    Mushroom(int x, int y, int initialCooldown);
+    Mushroom(int x, int y, int initialCooldown, bool hooked);
     void update(Map* map);
 };
