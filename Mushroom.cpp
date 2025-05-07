@@ -1,10 +1,9 @@
 #include "Mushroom.h"
 #include "Map.h"
 
-Mushroom::Mushroom(int x, int y, int initialCooldown, bool hooked) : Bloc(x, y, MUSHROOM, sf::Color::Magenta) {
+Mushroom::Mushroom(int x, int y, int initialCooldown) : Bloc(x, y, MUSHROOM, sf::Color::Magenta) {
     initialCooldown_ = initialCooldown;
     spreadCooldown_ = initialCooldown_;
-    hooked_ = false;
 }
 void Mushroom::update(Map* map) {
     if (--spreadCooldown_ <= 0) {
@@ -32,15 +31,13 @@ void Mushroom::update(Map* map) {
                                     Bloc* neighbor = map->getBlock(xx, yy);
                                     if (neighbor && neighbor->getType() == STONE) {
                                         stoneCount++;
-                                        hooked_ = true;
                                     }
                                 }
                             }
                         }
                         // Si au moins un STONE autour, on propage un champignon
                         if (stoneCount > 0) {
-                            map->setBlocInNextFrame(nx, ny, new Mushroom(nx, ny, initialCooldown_, hooked_));
-                            
+                            map->setBlocInNextFrame(nx, ny, new Mushroom(nx, ny, initialCooldown_));
                         }
                     }
                 }
@@ -52,29 +49,23 @@ void Mushroom::update(Map* map) {
     int x = getX();
     int y = getY();
     int stoneNeighbors = 0;
-
-    if (hooked_ = false) {
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) continue;
-                int nx = x + dx;
-                int ny = y + dy;
-                if (map->inBounds(nx, ny)) {
-                    Bloc* b = map->getBlock(nx, ny);
-                    if (b && b->getType() == STONE) {
-                        stoneNeighbors++;
-                    }
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            if (dx == 0 && dy == 0) continue;
+            int nx = x + dx;
+            int ny = y + dy;
+            if (map->inBounds(nx, ny)) {
+                Bloc* b = map->getBlock(nx, ny);
+                if (b && b->getType() == STONE) {
+                    stoneNeighbors++;
                 }
             }
         }
-
-        if (stoneNeighbors == 0 && map->inBounds(x, y + 1) && map->getBlock(x, y + 1) == nullptr) {
-            setY(y + 1);
-        }
-
-        map->setBlocInNextFrame(getX(), getY(), this);
     }
-    else {
-        removeBloc(getX(),getY());
+
+    if (stoneNeighbors == 0 && map->inBounds(x, y + 1) && map->getBlock(x, y + 1) == nullptr) {
+        setY(y + 1);
     }
+
+    map->setBlocInNextFrame(getX(), getY(), this);
 }

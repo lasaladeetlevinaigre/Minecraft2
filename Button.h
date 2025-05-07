@@ -1,10 +1,19 @@
-#pragma once
+// Button.h
+// Auteur : Benjamin Escuder
+// Description : Classe pour créer des boutons pour le menu
+// Chaque bouton a une action associée, une position, une taille, un texte,
+// des couleurs et d'autres paramètres d'affichage
+
+
+#ifndef BUTTON_H
+#define BUTTON_H
 
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 
-// Différentes actions des boutons
+
+// Enumération des actions possibles pour les boutons
 enum class ButtonAction {
     None,
     ToggleRunning,
@@ -12,6 +21,7 @@ enum class ButtonAction {
     AddSandBloc,
     AddStoneBloc,
     AddMushroomBloc,
+    AddWaterBloc,
     RemoveBloc,
 	IncreaseBrushRadius,
 	DecreaseBrushRadius,
@@ -23,7 +33,7 @@ enum class ButtonAction {
 
 class Button {
 private:
-    ButtonAction callbackAction_;
+	ButtonAction callbackAction_; // Action associée au bouton
     int width_;
     int height_;
     int x_;
@@ -31,13 +41,13 @@ private:
     std::string text_;
     sf::Font font_;
     int fontSize_;
-    sf::Color textColor_;
-    sf::Color outlineColor_;
-    std::vector<sf::Color> bgColor_;
+	sf::Color textColor_; // Couleur du texte
+	sf::Color outlineColor_; // Couleur de contour
+	std::vector<sf::Color> bgColor_; // Couleurs de fond lors que le bouton est sélectionné ou non
     bool selected_;
 
-    sf::RectangleShape rect_;
-    sf::Text sfText_;
+	sf::RectangleShape rect_; // Rectangle représentant le bouton
+	sf::Text sfText_; // Texte affiché sur le bouton
 
 public:
     // Constructeur
@@ -51,26 +61,29 @@ public:
         sf::Color outlineColor,
         std::vector<sf::Color> bgColor);
 
-    // Dessine le bouton sur la cible
+    // Dessine le bouton sur la fenêtre
     void draw(sf::RenderWindow& window);
 
-    // Retourne true si le curseur est dans le bouton
+    // Retourne vrai si le point en (x, y) est dans le bouton
     bool contains(int x, int y) const;
 
+
+	// Change l'état de sélection du bouton
+    void setSelected(bool sel) {
+        selected_ = sel;
+		rect_.setFillColor(bgColor_[selected_ ? 1 : 0]); // Change la couleur de fond
+    }
+
+    void setText(const std::string& text);
+
+
+    // Accesseurs
 	ButtonAction getAction() const {
 		return callbackAction_;
 	}
 	bool isSelected() const {
 		return selected_;
 	}
-	void setSelected(bool sel) {
-		selected_ = sel;
-		if (selected_) {
-			rect_.setFillColor(bgColor_[1]);
-		}
-		else {
-			rect_.setFillColor(bgColor_[0]);
-		}
-	}
-    void setText(const std::string& text);
 };
+
+#endif // BUTTON_H

@@ -1,4 +1,13 @@
-#pragma once
+// Menu.h
+// Auteur : Benjamin Escuder
+// Description : La classe Menu gère l'interface utilisateur du jeu, y compris les boutons
+// et les événements de la souris et du clavier
+
+
+#ifndef MENU_H
+#define MENU_H
+
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "Button.h"
@@ -9,6 +18,7 @@ enum class MenuState {
     EditingSand,
     EditingStone,
     EditingMushroom,
+    EditingWater,
     Deleting
 };
 
@@ -19,22 +29,33 @@ class Menu {
 private:
     Game* game_;
     Map* map_;
-    MenuState state_;
+	MenuState state_; // État du menu
 
-    int uiWidth_;
+	int uiWidth_; // Largeur de l'interface utilisateur en px
 
     sf::Font font_;
-    std::vector<Button> buttons_;
+	std::vector<Button> buttons_; // Boutons de l'interface utilisateur
 
     void createButtons(); // en interne
+    void setEditingSand();
+    void setEditingStone();
+    void setEditingMushroom();
+    void setEditingWater();
+    void setRemovingBloc();
+    void clearingMap();
 
-    bool isDrawingNow_;
+	bool isDrawingNow_;
 	int brushRadius_;
 
 public:
+	// Constructeur
     Menu(Game* game, Map* map, int uiWidth);
 
+	// Affiche l'interface utilisateur
     void drawUI(sf::RenderWindow& window) const;
 
+	// Gère les événements de la souris ET du clavier
     void handleEvent(const sf::Event& event, sf::RenderWindow& window);
 };
+
+#endif // !MENU_H

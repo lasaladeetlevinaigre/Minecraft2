@@ -1,10 +1,10 @@
+// Auteur : Benjamin Escuder
+
 #include "Button.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-using namespace std;
-
-
+// Initialisation du bouton
 Button::Button(ButtonAction action,
 	int x, int y,
 	int width, int height,
@@ -47,6 +47,8 @@ Button::Button(ButtonAction action,
 	sfText_.setPosition(x_ + width_ / 2.0f, y_ + height_ / 2.0f);
 
 }
+
+// Met à jour le texte du bouton
 void Button::setText(const std::string& text) {
 	text_ = text;
 	sfText_.setString(text);
@@ -56,10 +58,12 @@ void Button::setText(const std::string& text) {
 	sfText_.setPosition(x_ + width_ / 2.0f, y_ + height_ / 2.0f);
 }
 
+// Vérifie si le point (x, y) est à l'intérieur du rectangle
 bool Button::contains(int x, int y) const {
 	return (x >= x_ && x <= x_ + width_ && y >= y_ && y <= y_ + height_);
 }
 
+// Dessine le boutton dans la fenêtre
 void Button::draw(sf::RenderWindow& window) {
 	if (selected_)
 		rect_.setFillColor(bgColor_[1]);

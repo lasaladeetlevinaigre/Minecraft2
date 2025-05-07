@@ -1,3 +1,5 @@
+// Auteur : Benjamin Escuder
+
 #include "Menu.h"
 #include "Game.h"
 #include "Map.h"
@@ -5,11 +7,13 @@
 #include "Sand.h"
 #include "Stone.h"
 #include "Mushroom.h"
+#include "Water.h"
 #include <iostream>
 
 
-
+// Inverse l'état du jeu
 void toggleRunning(Game* game) {
+
 	if (game->isRunning()) {
 		std::cout << "Game paused" << std::endl;
 		game->setRunning(false);
@@ -20,7 +24,7 @@ void toggleRunning(Game* game) {
 	}
 }
 
-
+// Constructeur de la classe Menu
 Menu::Menu(Game* game, Map* map, int uiWidth) : game_(game), map_(map), uiWidth_(uiWidth), state_(MenuState::Idle), isDrawingNow_(false), brushRadius_(0) {
 	// Initialiser l'état du menu
 	state_ = MenuState::Idle;
@@ -31,16 +35,18 @@ Menu::Menu(Game* game, Map* map, int uiWidth) : game_(game), map_(map), uiWidth_
 	uiWidth_ = uiWidth;
 
 	// Initialiser la police
-	if (!font_.loadFromFile("NunitoSans.ttf")) {
+	if (!font_.loadFromFile("Arial.ttf")) {
 		std::cerr << "Error loading font" << std::endl;
 	}
 	createButtons();
+
+	// Affichage des commandes dans la console
 }
 
 void Menu::createButtons() {
 	// Créer les boutons avec leurs actions
 	/*
-	// Rappel déclarataion de Button :
+	Rappel construction de Button :
 	Button(ButtonAction action,
 			int x, int y,
 			int width, int height,
@@ -52,6 +58,7 @@ void Menu::createButtons() {
 			std::vector<sf::Color> bgColor);
 	*/
 	int y = 10; // Position y de départ pour les boutons
+
 
 	Button button_toggle_running = Button(ButtonAction::ToggleRunning,
 		game_->getWidth() - uiWidth_ + 10, y,
@@ -66,6 +73,7 @@ void Menu::createButtons() {
 	buttons_.push_back(button_toggle_running);
 	y += 40; // Espace entre les boutons
 
+
 	buttons_.push_back(Button(ButtonAction::None,
 		game_->getWidth() - uiWidth_ + 10, y,
 		uiWidth_ - 20, 30,
@@ -73,35 +81,32 @@ void Menu::createButtons() {
 		font_,
 		18,
 		sf::Color::White,
-		sf::Color(50, 50, 50),
-		std::vector<sf::Color>{ sf::Color(50, 50, 50), sf::Color(50, 50, 50) }));
+		sf::Color(50, 50, 50, 200),
+		std::vector<sf::Color>{ sf::Color(50, 50, 50, 200), sf::Color(50, 50, 50, 200) }));
 	y += 40;
 
 
 	// Modifier la taille du pinceau
-	buttons_.push_back(Button(ButtonAction::IncreaseBrushRadius,
+	buttons_.push_back(Button(ButtonAction::DecreaseBrushRadius,
 		game_->getWidth() - uiWidth_ + 10, y,
 		uiWidth_/2 - 15, 30,
-		"++ pinceau",
+		"Decrease",
 		font_,
 		18,
 		sf::Color::White,
 		sf::Color::Black,
 		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
 
-	buttons_.push_back(Button(ButtonAction::DecreaseBrushRadius,
+	buttons_.push_back(Button(ButtonAction::IncreaseBrushRadius,
 		game_->getWidth() - uiWidth_ + uiWidth_/2 + 5, y,
 		uiWidth_/2 - 15, 30,
-		"-- pinceau",
+		"Increase",
 		font_,
 		18,
 		sf::Color::White,
 		sf::Color::Black,
 		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
 	y += 40;
-
-
-
 
 	buttons_.push_back(Button(ButtonAction::AddSandBloc,
 		game_->getWidth() - uiWidth_ + 10, y,
@@ -136,10 +141,21 @@ void Menu::createButtons() {
 		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
 	y += 40;
 
+	buttons_.push_back(Button(ButtonAction::AddWaterBloc,
+		game_->getWidth() - uiWidth_ + 10, y,
+		uiWidth_ - 20, 30,
+		"Place Water",
+		font_,
+		18,
+		sf::Color::White,
+		sf::Color::Black,
+		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
+	y += 40;
+
 	buttons_.push_back(Button(ButtonAction::RemoveBloc,
 		game_->getWidth() - uiWidth_ + 10, y,
 		uiWidth_ - 20, 30,
-		"Erase Block",
+		"Remove Block",
 		font_,
 		18,
 		sf::Color::White,
@@ -214,19 +230,68 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 		}
 	}
 
-	// Faire apparaitre un bloc de sable
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S) {
+	// Effacer la map avec [C]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::C) {
+		clearingMap();
+	}
+
+	// Next frame avec [N]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::N) {
+		map_->update();
+	}
+
+	// Faire apparaitre un bloc de sable aléatoirement
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
 		summonRandomSand(map_);
 	}
+
+	// Entrer en mode édition de sable avec [S]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::S) {
+		setEditingSand();
+	}
+
+	// Entrer en mode édition de pierre avec [P]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P) {
+		setEditingStone();
+	}
+
+	// Entrer en mode édition de champignon avec [M]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::M) {
+		setEditingMushroom();
+	}
+
+	// Entrer en mode édition de eau avec [W]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::W) {
+		setEditingWater();
+	}
+
+	// Entrer en mode démolition avec [B]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::B) {
+		setRemovingBloc();
+	}
+	
+
+	// Modifier la taille de la brosse avec + et -
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add) {
+		if (brushRadius_ < 9)
+			brushRadius_++;
+		for (auto& b : buttons_)
+			if (b.getAction() == ButtonAction::None)
+				b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
+	}
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract) {
+		if (brushRadius_ > 0)
+			brushRadius_--;
+		for (auto& b : buttons_)
+			if (b.getAction() == ButtonAction::None)
+				b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
+	}
+
 
 	// 
 	if (event.type == sf::Event::MouseButtonPressed) {
 		// Vérifier si le curseur est sur la carte
-		if (event.mouseButton.x < game_->getWidth() - uiWidth_ && (
-			state_ == MenuState::EditingSand ||
-			state_ == MenuState::EditingStone ||
-			state_ == MenuState::EditingMushroom ||
-			state_ == MenuState::Deleting)) {
+		if (event.mouseButton.x < game_->getWidth() - uiWidth_ && state_ != MenuState::Idle) {
 			isDrawingNow_ = true;
 	
 		}
@@ -274,6 +339,17 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 					}
 					break;
 
+				case MenuState::EditingWater:
+					// Adapter à la taille du pinceau
+					for (int i = -brushRadius_; i <= brushRadius_; ++i) {
+						for (int j = -brushRadius_; j <= brushRadius_; ++j) {
+							if (map_->inBounds(x + i, y + j)) {
+								map_->setBlocInCurrentFrame(x + i, y + j, new Water(x + i, y + j));
+							}
+						}
+					}
+					break;
+
 				case MenuState::Deleting:
 					// Adapter à la taille du pinceau
 					for (int i = -brushRadius_; i <= brushRadius_; ++i) {
@@ -313,98 +389,32 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 						break;
 
 					case ButtonAction::AddSandBloc:
-						// Mettre à jour l'état du menu
-						if (state_ != MenuState::EditingSand) {
-
-							// On commence à dessiner
-							state_ = MenuState::EditingSand;
-
-							button.setSelected(true);
-							for (auto& b : buttons_) {
-								if (b.getAction() == ButtonAction::AddMushroomBloc ||
-									b.getAction() == ButtonAction::AddStoneBloc ||
-									b.getAction() == ButtonAction::RemoveBloc)
-									b.setSelected(false);
-							}
-						}
-						else {
-							// On arrête de dessiner
-							state_ = MenuState::Idle;
-							button.setSelected(false);
-						}
+						setEditingSand();
 						break;
 
 					case ButtonAction::AddStoneBloc:
-						// Mettre à jour l'état du menu
-						if (state_ != MenuState::EditingStone) {
-
-							// On commence à dessiner
-							state_ = MenuState::EditingStone;
-
-							button.setSelected(true);
-							for (auto& b : buttons_) {
-								if (b.getAction() == ButtonAction::AddMushroomBloc ||
-									b.getAction() == ButtonAction::AddSandBloc ||
-									b.getAction() == ButtonAction::RemoveBloc)
-									b.setSelected(false);
-							}
-						}
-						else {
-							// On arrête de dessiner
-							state_ = MenuState::Idle;
-							button.setSelected(false);
-						}
+						setEditingStone();
 						break;
 
 					case ButtonAction::AddMushroomBloc:
-						// Mettre à jour l'état du menu
-						if (state_ != MenuState::EditingMushroom) {
-
-							// On commence à dessiner
-							state_ = MenuState::EditingMushroom;
-
-							button.setSelected(true);
-							for (auto& b : buttons_) {
-								if (b.getAction() == ButtonAction::AddStoneBloc ||
-									b.getAction() == ButtonAction::AddSandBloc ||
-									b.getAction() == ButtonAction::RemoveBloc)
-									b.setSelected(false);
-							}
-						}
-						else {
-							// On arrête de dessiner
-							state_ = MenuState::Idle;
-							button.setSelected(false);
-						}
+						setEditingMushroom();
 						break;
+
+					case ButtonAction::AddWaterBloc:
+						setEditingWater();
+						break;
+
 					case ButtonAction::RemoveBloc:
-						// Mettre à jour l'état du menu
-						if (state_ != MenuState::Deleting) {
-
-							// On commence à dessiner
-							state_ = MenuState::Deleting;
-
-							button.setSelected(true);
-							for (auto& b : buttons_) {
-								if (b.getAction() == ButtonAction::AddMushroomBloc ||
-									b.getAction() == ButtonAction::AddStoneBloc ||
-									b.getAction() == ButtonAction::AddSandBloc)
-									b.setSelected(false);
-							}
-						}
-						else {
-							// On arrête de dessiner
-							state_ = MenuState::Idle;
-							button.setSelected(false);
-						}
+						setRemovingBloc();
 						break;
+
 					case ButtonAction::IncreaseBrushRadius:
 						// Augmenter le rayon du pinceau
 						if (brushRadius_ < 9)
 							brushRadius_++;
-						for(auto& b: buttons_)
+						for (auto& b : buttons_)
 							if (b.getAction() == ButtonAction::None)
-								b.setText("Brush size: " + std::to_string(brushRadius_*2+1));
+								b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
 
 						break;
 					case ButtonAction::DecreaseBrushRadius:
@@ -413,19 +423,11 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 							brushRadius_--;
 						for (auto& b : buttons_)
 							if (b.getAction() == ButtonAction::None)
-								b.setText("Brush size: " + std::to_string(brushRadius_*2+1));
+								b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
 						break;
 					case ButtonAction::ClearMap:
 						// Effacer la carte
-						map_->clear();
-						std::cout << "Map cleared" << std::endl;
-						for (auto& b : buttons_) {
-							if (b.getAction() == ButtonAction::AddMushroomBloc ||
-								b.getAction() == ButtonAction::AddStoneBloc ||
-								b.getAction() == ButtonAction::AddSandBloc ||
-								b.getAction() == ButtonAction::RemoveBloc)
-								b.setSelected(false);
-						}
+						clearingMap();
 						break;
 					case ButtonAction::Quit:
 						std::cout << "Game closed" << std::endl;
@@ -440,5 +442,160 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 			// On arrête de dessiner
 			isDrawingNow_ = false;
 		}
+	}
+}
+
+// Fonction pour l'édition de sable
+void Menu::setEditingSand() {
+	Button* button = nullptr;
+	for (auto& b : buttons_) {
+		if (b.getAction() == ButtonAction::AddSandBloc) {
+			button = &b;
+			break;
+		}
+	}
+
+	// Mettre à jour l'état du menu
+	if (state_ != MenuState::EditingSand) {
+
+		// On commence à dessiner
+		state_ = MenuState::EditingSand;
+
+		for (auto& b : buttons_) {
+			if (b.getAction() != ButtonAction::ToggleRunning)
+				b.setSelected(false);
+		}
+		button->setSelected(true);
+	}
+	else {
+		// On arrête de dessiner
+		state_ = MenuState::Idle;
+		button->setSelected(false);
+	}
+}
+
+void Menu::setEditingStone() {
+	Button* button = nullptr;
+	for (auto& b : buttons_) {
+		if (b.getAction() == ButtonAction::AddStoneBloc) {
+			button = &b;
+			break;
+		}
+	}
+
+	// Mettre à jour l'état du menu
+	if (state_ != MenuState::EditingStone) {
+
+		// On commence à dessiner
+		state_ = MenuState::EditingStone;
+
+		for (auto& b : buttons_) {
+			if (b.getAction() != ButtonAction::ToggleRunning)
+				b.setSelected(false);
+		}
+		button->setSelected(true);
+	}
+	else {
+		// On arrête de dessiner
+		state_ = MenuState::Idle;
+		button->setSelected(false);
+	}
+}
+
+void Menu::setEditingMushroom() {
+	Button* button = nullptr;
+	for (auto& b : buttons_) {
+		if (b.getAction() == ButtonAction::AddMushroomBloc) {
+			button = &b;
+			break;
+		}
+	}
+
+	// Mettre à jour l'état du menu
+	if (state_ != MenuState::EditingMushroom) {
+
+		// On commence à dessiner
+		state_ = MenuState::EditingMushroom;
+
+		for (auto& b : buttons_) {
+			if (b.getAction() != ButtonAction::ToggleRunning)
+				b.setSelected(false);
+		}
+		button->setSelected(true);
+	}
+	else {
+		// On arrête de dessiner
+		state_ = MenuState::Idle;
+		button->setSelected(false);
+	}
+}
+
+void Menu::setEditingWater() {
+	Button* button = nullptr;
+	for (auto& b : buttons_) {
+		if (b.getAction() == ButtonAction::AddWaterBloc) {
+			button = &b;
+			break;
+		}
+	}
+
+	// Mettre à jour l'état du menu
+	if (state_ != MenuState::EditingWater) {
+
+		// On commence à dessiner
+		state_ = MenuState::EditingWater;
+
+		for (auto& b : buttons_) {
+			if (b.getAction() != ButtonAction::ToggleRunning)
+				b.setSelected(false);
+		}
+		button->setSelected(true);
+	}
+	else {
+		// On arrête de dessiner
+		state_ = MenuState::Idle;
+		button->setSelected(false);
+	}
+}
+
+void Menu::setRemovingBloc() {
+	Button* button = nullptr;
+	for (auto& b : buttons_) {
+		if (b.getAction() == ButtonAction::RemoveBloc) {
+			button = &b;
+			break;
+		}
+	}
+
+
+	// Mettre à jour l'état du menu
+	if (state_ != MenuState::Deleting) {
+
+		// On commence à dessiner
+		state_ = MenuState::Deleting;
+
+		for (auto& b : buttons_) {
+			if (b.getAction() != ButtonAction::ToggleRunning)
+				b.setSelected(false);
+		}
+		button->setSelected(true);
+	}
+	else {
+		// On arrête de dessiner
+		state_ = MenuState::Idle;
+		button->setSelected(false);
+	}
+}
+
+void Menu::clearingMap() {
+	map_->clear();
+	isDrawingNow_ = false;
+	state_ = MenuState::Idle;
+	std::cout << "Map cleared" << std::endl;
+	for (auto& b : buttons_) {
+		if (b.getAction() != ButtonAction::ToggleRunning)
+			b.setSelected(false);
+
+
 	}
 }
