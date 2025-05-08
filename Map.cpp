@@ -55,8 +55,8 @@ void Map::update() {
 				nbWaterBloc_++;
 
 				// on limite l'apparition spontannée de poissons
-				if (fishes_.size() < maxFishCount && rand() % 50000 == 0) { // 0.002% chance de spawn à chaque frame
-					addFish(new Fish(x, y, "Steve", sf::Color(115, 232, 19, 255)));
+				if (fishes_.size() < maxFishCount && rand() % 500000 == 0) { // 0.0002% chance de spawn à chaque frame
+					addFish(new Fish(x, y, "Steve", sf::Color(255, 140, 60, 255)));
 				}
 			}
 		}
