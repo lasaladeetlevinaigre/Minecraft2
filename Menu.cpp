@@ -8,6 +8,7 @@
 #include "Stone.h"
 #include "Mushroom.h"
 #include "Water.h"
+#include "Fish.h"
 #include <iostream>
 
 
@@ -144,6 +145,8 @@ void Menu::createButtons() {
 		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
 	y += 40;
 
+
+
 	buttons_.push_back(Button(ButtonAction::AddSandBloc,
 		game_->getWidth() - uiWidth_ + 10, y,
 		uiWidth_ - 20, 30,
@@ -244,9 +247,25 @@ void summonRandomSand(Map* map) {
 	int y = rand() % map->getHeight();
 	if (map->inBounds(x, y)) {
 		map->setBlocInCurrentFrame(x, y, new Sand(x, y));
-		//std::cout << "Summoned sand block at (" << x << ", " << y << ")" << std::endl;
 	}
 }
+
+void summonRandomFish(Map* map) {
+	for (int i = 0; i < 100; ++i) {
+		int x = rand() % map->getWidth();
+		int y = rand() % map->getHeight();
+
+		if (!map->inBounds(x, y))
+			continue;
+
+		Bloc* bloc = map->getBlock(x, y);
+		if (bloc && bloc->getType() == WATER) {
+			map->addFish(new Fish(x, y, "Steve", sf::Color(255, 140, 60, 255)));
+			break;
+		}
+	}
+}
+
 
 void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 
@@ -276,9 +295,14 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 		map_->update();
 	}
 
-	// Faire apparaitre un bloc de sable aléatoirement
+	// Faire apparaitre un bloc de sable aléatoirement avec [R]
 	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
 		summonRandomSand(map_);
+	}
+
+	// Faire apparaitre un poisson aléatoirement avec [F]
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F) {
+		summonRandomFish(map_);
 	}
 
 	// Entrer en mode édition de sable avec [S]
@@ -479,7 +503,6 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 						}
 						break;
 
-
 					case ButtonAction::ClearMap:
 						// Effacer la carte
 						clearingMap();
@@ -650,7 +673,5 @@ void Menu::clearingMap() {
 	for (auto& b : buttons_) {
 		if (b.getAction() != ButtonAction::ToggleRunning)
 			b.setSelected(false);
-
-
 	}
 }

@@ -2,14 +2,12 @@
 
 #include "Map.h"
 #include "Bloc.h"
-#include "Sand.h"
-#include "Stone.h"
-#include "Mushroom.h"
+#include "Fish.h"
 
 
 // Initialisation de la grille
 Map::Map(int screenWidth, int screenHeight, int blockSize)
-	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize) {
+	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize), nbWaterBloc_(0) {
 
 	std::cout << "Map dimensions : " << width_ << " x " << height_ << std::endl;
 	currentGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
@@ -27,6 +25,9 @@ Map::~Map() {
 			delete block;
 		}
 	}
+	for (Fish* fish : fishes_) {
+		delete fish;
+	}
 }
 
 void Map::update() {
@@ -42,13 +43,39 @@ void Map::update() {
 			}
 		}
 	}
+	// On met à jour les blocs d'eau dans un second temps
+	int nombre_water_bloc = nbWaterBloc_;
+	int maxFishCount = nombre_water_bloc / 100; // 1 poisson pour 100 blocs d'eau MAX
+
+	nbWaterBloc_ = 0;
 	for (int y = height_ - 1; y >= 0; --y) {
 		for (int x = 0; x < width_; ++x) {
 			if (currentGrid_[y][x] && currentGrid_[y][x]->getType() == WATER) {
 				currentGrid_[y][x]->update(this);
+				nbWaterBloc_++;
+
+				// on limite l'apparition spontannée de poissons
+				if (fishes_.size() < maxFishCount && rand() % 50000 == 0) { // 0.002% chance de spawn à chaque frame
+					addFish(new Fish(x, y, "Steve", sf::Color(115, 232, 19, 255)));
+				}
 			}
 		}
 	}
+
+	// On met à jour les entités
+	for (int i = 0; i < fishes_.size();) {
+		fishes_[i]->update(this);
+
+		if (!fishes_[i]->isAlive()) {
+			// fish est mort
+			delete fishes_[i];
+			fishes_.erase(fishes_.begin() + i); // debut + "numero" du poisson
+		}
+		else {
+			i++;
+		}
+	}
+
 	
 	// Nettoyage de currentGrid_
 	int nbBlocks = 0;
@@ -74,6 +101,10 @@ void Map::draw(sf::RenderWindow& window) const {
 			}
 		}
 	}
+	for (Fish *fish : fishes_) {
+		fish->draw(window, blockSize_);
+	}
+
 }
 
 void Map::setBlocInCurrentFrame(int x, int y, Bloc* block) {
@@ -102,6 +133,10 @@ void Map::removeBloc(int x, int y) {
 	}
 }
 
+void Map::addFish(Fish *fish) {
+	fishes_.push_back(fish);
+}
+
 // Efface tous les blocs de la carte
 void Map::clear() {
 	for (int y = 0; y < height_; ++y) {
@@ -109,6 +144,10 @@ void Map::clear() {
 			delete currentGrid_[y][x]; // Libération de la mémoire
 			currentGrid_[y][x] = nullptr;
 		}
+		for (Fish* fish : fishes_) {
+			delete fish;
+		}
+		fishes_.clear();
 	}
 }
 

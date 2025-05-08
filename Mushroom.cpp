@@ -31,16 +31,16 @@ void Mushroom::update(Map* map) {
         hooked_ = true;
     }
 
-    //Comportement non accroché
+    //Comportement non accroch?
     if (hooked_ == false) {
         // Tombe si pas de voisin STONE et vide ou WATER en en dessous
         Bloc* bellow = map->getBlock(x, y + 1);
-        if (stoneNeighbors == 0 && map->inBounds(x, y + 1) && (bellow == nullptr ||(bellow && bellow->getType()==WATER))) {
+        if (stoneNeighbors == 0 && map->inBounds(x, y + 1) && (bellow == nullptr || (bellow && bellow->getType() == WATER))) {
             setY(y + 1);
         }
         map->setBlocInNextFrame(getX(), getY(), this);
     }
-    //Comportement accroché
+    //Comportement accroch?
     if (hooked_ == true) {
         if (stoneNeighbors > 0) {
             map->setBlocInNextFrame(getX(), getY(), this);
@@ -64,8 +64,8 @@ void Mushroom::update(Map* map) {
                 if (map->inBounds(nx, ny)) {
                     Bloc* adjacent = map->getBlock(nx, ny);
                     //Si le bloc adjaent est vide ou de l'eau
-                    if (adjacent == nullptr ||(adjacent && adjacent->getType() == WATER)) {
-                        // Vérifie s'il y a des blocs STONE autour de la case libre
+                    if (adjacent == nullptr || (adjacent && adjacent->getType() == WATER)) {
+                        // V?rifie s'il y a des blocs STONE autour de la case libre
                         int stoneCount = 0;
                         for (int rx = -1; rx <= 1; rx++) {
                             for (int ry = -1; ry <= 1; ry++) {
@@ -96,5 +96,4 @@ void Mushroom::update(Map* map) {
 
 
 
-    
 

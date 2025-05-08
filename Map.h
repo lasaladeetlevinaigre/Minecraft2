@@ -10,6 +10,7 @@
 #include <iostream>
 
 class Bloc;
+class Fish;
 
 class Map
 {
@@ -25,6 +26,9 @@ private:
     std::vector<std::vector<Bloc*>> currentGrid_;
     std::vector<std::vector<Bloc*>> nextGrid_;
 
+	int nbWaterBloc_;
+	std::vector<Fish *> fishes_;
+
 public:
 	// Constructeur et destructeur
 	Map(int screenWidth, int screenHeight, int blockSize);
@@ -36,6 +40,8 @@ public:
 	void setBlocInNextFrame(int x, int y, Bloc* bloc); 
 	void setBlocInCurrentFrame(int x, int y, Bloc* bloc);
 	void removeBloc(int x, int y);
+
+	void addFish(Fish *fish);
 
 	void clear(); // Efface la carte
 
