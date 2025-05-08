@@ -13,7 +13,7 @@ public:
 	Water(int x, int y);
 
 	// Mettre à jour la propagation
-	void update(Map* map);
+	void update(Map* map) override;
 };
 
 #endif // !WATER_H
