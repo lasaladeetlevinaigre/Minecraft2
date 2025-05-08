@@ -1,3 +1,7 @@
+// Water.h
+// Auteur : Benjamin Escuder
+// Description : La classe Water hérite de la classe Bloc et représente un bloc d'eau
+
 #ifndef WATER_H
 #define WATER_H
 
@@ -5,7 +9,7 @@
 #include "Bloc.h"
 
 class Water : public Bloc {
-	// Inertie
+	// Inertie issue du déplacement précedent
 	bool wasGoingLeft_;
 	bool wasGoingRight_;
 public:

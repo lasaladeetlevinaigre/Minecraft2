@@ -1,15 +1,10 @@
+// Water.cpp
+// Auteur : Benjamin Escuder
 #include "Water.h"
 #include "Map.h"
 #include <cstdlib>
 
 Water::Water(int x, int y) : Bloc(x, y, WATER, sf::Color::Blue), wasGoingLeft_(false), wasGoingRight_(false) {
-    // set random color
-    /*
-	int r = rand() % 256;
-	int g = rand() % 256;
-	int b = rand() % 256;
-	setColor(sf::Color(r, g, b));
-    */
 }
 
 void Water::update(Map* map) {
@@ -29,7 +24,6 @@ void Water::update(Map* map) {
 		(map->getBlock(x - 1, y) && map->getBlock(x - 1, y)->getType() != WATER || !map->getBlock(x - 1, y)); // la case n'était pas de l'eau
 	bool canRight = map->inBounds(x + 1, y) && map->getBlockInNextGrid(x + 1, y) == nullptr && // la case est vide
 		(map->getBlock(x + 1, y) && map->getBlock(x + 1, y)->getType() != WATER || !map->getBlock(x + 1, y)); // la case n'était pas de l'eau
-
 
 
     // Regarder si on peut descendre en bas à gauche ou en bas à droite
@@ -88,8 +82,7 @@ void Water::update(Map* map) {
     }
 
 
-	// si on peut aller à gauche ou à droite HORIZONTALMENT
-
+	// si on peut aller à gauche ou à droite HORIZONTALMENT, on le fait
 	if (canLeft && canRight) {
         // priorité à l'inertie
         if (wasGoingLeft_ && !wasGoingRight_) {
@@ -141,11 +134,11 @@ void Water::update(Map* map) {
 		return;
 	}
 
-	// On ne peut descendre, aller sur les cotés ni rester au meme endroit => on doit monter$
-	// faire une boucle, on monte tant qu'on ne peut pas s'arreter, et on regarde à chaque fois à gauche et à droite
-	// si on peut pas s'échapper de la montée
+	// On ne peut pas descendre, ni aller sur les cotés ni rester au meme endroit => on doit monter$
+	// On fait une boucle, on monte tant qu'on ne peut pas se placer, et on regarde à chaque fois à gauche et à droite
+	// si on peut pas s'échapper de la montée pour éviter de monter simplement en ligne droite verticalement
 
-    int newY = y - 1;
+    int newY = y - 1; // un niveau plus haut
     while (map->inBounds(x, newY)) {
 
         // Vérifier si on peut s'arrêter à ce niveau
@@ -187,19 +180,12 @@ void Water::update(Map* map) {
             return;
         }
 
-        // Continuer à monter
+        // Sinon, continuer à monter
         newY--;
     }
 
-    // si on est ici, on a atteint le haut de la map sans trouver de place
-    std::cout << "WATER BLOCK TRAPPED AT TOP OF MAP: " << x << "," << y << std::endl;
-    setColor(sf::Color::Red);
-    map->setBlocInNextFrame(x, y, this);  // Le laisser sur place (il sera ptt écrasé)
-
+    // si on est ici, on a atteint le haut de la map sans trouver de place, comportement indéfini
+    map->setBlocInNextFrame(x, y, this);  // Le laisser ici
 
     return;
-
-
-
-
 }

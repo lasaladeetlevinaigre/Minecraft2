@@ -1,3 +1,4 @@
+// Map.cpp
 // Auteur : Benjamin Escuder
 
 #include "Map.h"
@@ -35,7 +36,7 @@ void Map::update() {
 	// On construit la grille suivante que l'on remplace par la courante
 	// Parcours de la grille du bas vers le haut pour la gravité
 
-	// On ne fait pas les blocs d'eau pour le moment
+	// On ne traite pas les blocs d'eau pour le moment
 	for (int y = height_ - 1; y >= 0; --y) {
 		for (int x = 0; x < width_; ++x) {
 			if (currentGrid_[y][x] && currentGrid_[y][x]->getType() != WATER) {
@@ -43,7 +44,9 @@ void Map::update() {
 			}
 		}
 	}
+
 	// On met à jour les blocs d'eau dans un second temps
+	// Régulation de l'apparition de poissons
 	int nombre_water_bloc = nbWaterBloc_;
 	int maxFishCount = nombre_water_bloc / 100; // 1 poisson pour 100 blocs d'eau MAX
 
@@ -67,7 +70,7 @@ void Map::update() {
 		fishes_[i]->update(this);
 
 		if (!fishes_[i]->isAlive()) {
-			// fish est mort
+			// fish est mort 
 			delete fishes_[i];
 			fishes_.erase(fishes_.begin() + i); // debut + "numero" du poisson
 		}
@@ -78,10 +81,9 @@ void Map::update() {
 
 	
 	// Nettoyage de currentGrid_
-	int nbBlocks = 0;
 	for (auto& row : currentGrid_) {
 		for (auto& block : row) {
-			block = nullptr; // pas de fuite mémoire si on a bien gérer la suppression des blocs 
+			block = nullptr; // pas de fuite mémoire si on a bien gérer la suppression des blocs
 		}
 	}
 
@@ -90,7 +92,6 @@ void Map::update() {
 	currentGrid_ = nextGrid_;
 	nextGrid_ = temp;
 }
-
 
 // Dessin de la grille courante
 void Map::draw(sf::RenderWindow& window) const {
@@ -137,7 +138,7 @@ void Map::addFish(Fish *fish) {
 	fishes_.push_back(fish);
 }
 
-// Efface tous les blocs de la carte
+// Efface tous les blocs et entités de la carte
 void Map::clear() {
 	for (int y = 0; y < height_; ++y) {
 		for (int x = 0; x < width_; ++x) {

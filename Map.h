@@ -19,7 +19,7 @@ private:
 	int width_;
 	int height_;
 
-	// Taille d'un bloc en pixel 
+	// Taille d'un bloc en pixel
     int blockSize_;
 
 	// Grille de blocs

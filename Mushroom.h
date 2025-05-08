@@ -13,7 +13,7 @@ class Mushroom : public Bloc {
 	// Temps avant que le champignon ne se propage
 	int spreadCooldown_;
 	int initialCooldown_;
-	bool hooked_;
+	bool hooked_; // Permet de savoir si un champignon a déjà été accroché à une pierre
 public:
 
 	// Constructeur

@@ -1,10 +1,12 @@
+// Fish.cpp
+// Auteur: Benjamin Escuder
 #include "Fish.h"
 #include "Map.h"
 #include "Bloc.h"
 
 Fish::Fish(int x, int y, std::string name, sf::Color color)
 	: x_(x), y_(y), name_(name), color_(color), initialColor_(color),
-	direction_(rand() % 2 ? 1 : -1), // Direction aléatoire
+	direction_(rand() % 2 ? 1 : -1), // Direction aléatoire au début
 	swimCooldown_(30),
 	timeLeftToLive_(250),
 	changeDirCooldown_(60),
@@ -20,17 +22,17 @@ void Fish::update(Map* map) {
 		map->getBlockInNextGrid(x_, y_)->getType() != WATER) {
 		// Hors de l'eau
 
-		// Suffoqué par un bloc => on monte
+		// Suffoqué par un bloc ==> on essaye de monter
 		if (map->getBlockInNextGrid(x_, y_)	// suffoqué par un bloc
-			&& map->inBounds(x_, y_ - 1) && (!map->getBlockInNextGrid(x_, y_ - 1) ||	// soit le bloc au dessus est vide
-			(map->getBlockInNextGrid(x_, y_ - 1)->getType() == WATER)		// soit il y a un bloc d'eau dans lequel Fish peut monter
+			&& map->inBounds(x_, y_ - 1) && (!map->getBlockInNextGrid(x_, y_ - 1) || // soit le bloc au dessus est vide
+			(map->getBlockInNextGrid(x_, y_ - 1)->getType() == WATER)		         // soit il y a un bloc d'eau dans lequel Fish peut monter
 			)) {
 			y_ -= 1;
 		}
 
-		// Suffoqué par manque d'eau => on est dans l'air => Gravité
-		if (map->inBounds(x_, y_+1) && (!map->getBlockInNextGrid(x_, y_+1) ||	// soit le bloc dessous est vide
-			(map->getBlockInNextGrid(x_, y_ + 1)->getType() == WATER )		// soit il y a un bloc d'eau dans lequel Fish peut tomber
+		// Suffoqué par manque d'eau, on est dans l'air ==> Gravité
+		if (map->inBounds(x_, y_+1) && (!map->getBlockInNextGrid(x_, y_+1) || // soit le bloc dessous est vide
+			(map->getBlockInNextGrid(x_, y_ + 1)->getType() == WATER )		  // soit il y a un bloc d'eau dans lequel Fish peut tomber
 			)){
 			y_ += 1;
 		}
@@ -42,7 +44,7 @@ void Fish::update(Map* map) {
 		}
 		else {
 			// Le poisson suffoque !!
-			// On fait clignoter le poisson en rouge,
+			// On fait clignoter le poisson en rouge à l'aide de flashCooldown, 
 			if (--flashCooldown_ <= 10)
 				color_ = initialColor_;
 			else
@@ -72,7 +74,7 @@ void Fish::update(Map* map) {
 			map->getBlockInNextGrid(x_ + direction_, y_)->getType() == WATER) {
 			x_ += direction_;
 		}
-		// Direction opposée
+		// Dans la direction opposée
 		else if (map->inBounds(x_ - direction_, y_) &&
 			map->getBlockInNextGrid(x_ - direction_, y_) &&
 			map->getBlockInNextGrid(x_ - direction_, y_)->getType() == WATER) {
@@ -81,12 +83,12 @@ void Fish::update(Map* map) {
 		}
 
 		// Mouvement VERTICAL
-		if (rand() % 3 == 0) { // 33 % de chance de cahnger d'hauteur
+		if (rand() % 2 == 0) { // 50 % de chance de changer d'hauteur
 			bool justBelowSurface = !map->inBounds(x_, y_ - 1) || 
 				(map->getBlockInNextGrid(x_, y_ - 1) && map->getBlockInNextGrid(x_, y_ - 1)->getType() != WATER);
 			
-			// Priorité descente si près de la surface
-			int verticalDir = (justBelowSurface || rand() % 3 > 0) ? 1 : -1;  // 50% chance de monter/descendre
+			// Priorité à la descente si on est près de la surface
+			int verticalDir = (justBelowSurface || rand() % 2 > 0) ? 1 : -1;  // 50% chance de monter ou descendre
 
 			if (map->inBounds(x_, y_ + verticalDir) &&
 				map->getBlockInNextGrid(x_, y_ + verticalDir) &&
@@ -95,11 +97,12 @@ void Fish::update(Map* map) {
 			}
 		}
 
-		swimCooldown_ = 10 + rand() % 20; // Vitesse de la nage aléatoire pour rendre le mvnt plus naturel
+		swimCooldown_ = 5 + rand() % 30; // Vitesse de la nage aléatoire pour rendre le mvnt plus naturel
 	}
 
 }
 
+// On dessine le poisson comme un carré à ses coordonnées
 void Fish::draw(sf::RenderWindow& window, int blockSize) const {
 	sf::RectangleShape rectangle(sf::Vector2f(blockSize, blockSize));
 	rectangle.setPosition(x_ * blockSize, y_ * blockSize);

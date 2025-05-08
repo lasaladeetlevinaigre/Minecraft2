@@ -13,7 +13,7 @@
 class Game
 {
 	sf::RenderWindow window_;
-	int uiWidth_;
+	int uiWidth_; // Largeur du panneau de controle latéral
 
 	int width_, height_; // Taille de la fenêtre
 	int blockSize_;	     // Nombre de pixels par bloc

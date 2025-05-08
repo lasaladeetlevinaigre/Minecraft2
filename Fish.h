@@ -1,3 +1,7 @@
+// Fish.h
+// Auteur : Benjamin Escuder
+// Défini une entité poisson
+
 #ifndef FISH_H
 #define FISH_H
 
@@ -13,8 +17,8 @@ class Fish {
     sf::Color color_;
 
     int direction_; // -1: gauche, 1: droite
-    int changeDirCooldown_;
-    int swimCooldown_;
+    int changeDirCooldown_; // temps avant de pouvoir changer de direction
+    int swimCooldown_; // temps avant de se deplacer
     int timeLeftToLive_;
     int flashCooldown_; // permet de gerer le clignotement lorsque le poisson suffoque
     bool isAlive_;
@@ -23,7 +27,6 @@ public:
 	Fish(int x, int y, std::string name, sf::Color color);
 	void update(Map* map);
 	void draw(sf::RenderWindow& window, int blockSize) const;
-
     bool isAlive() const { return isAlive_; }
 
 };

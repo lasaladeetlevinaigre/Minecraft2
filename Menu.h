@@ -1,5 +1,5 @@
 // Menu.h
-// Auteur : Benjamin Escuder
+// Auteur : Antoine Horion et Benjamin Escuder
 // Description : La classe Menu gère l'interface utilisateur du jeu, y compris les boutons
 // et les événements de la souris et du clavier
 
@@ -36,17 +36,21 @@ private:
     sf::Font font_;
 	std::vector<Button> buttons_; // Boutons de l'interface utilisateur
 
-    void createButtons(); // en interne
+    // Méthodes internes
+    void createButtons(); // Permet d'initialisé la liste de bouttons
+
+    // Entrer-Sortir des modes d'édition respectifs à chaque matériau
     void setEditingSand();
     void setEditingStone();
     void setEditingMushroom();
     void setEditingWater();
     void setRemovingBloc();
-    void clearingMap();
+
+    void clearingMap(); // Pour réinitialiser toute la carte et le menu
 
 	bool isDrawingNow_;
 	int brushRadius_;
-    int mushroomCD_;
+    int mushroomCD_; // Contrôle le CoolDown des Mushroom placés
 
 public:
 	// Constructeur

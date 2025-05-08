@@ -1,4 +1,4 @@
-// Auteur : Benjamin Escuder
+// Auteur : Benjamin Escuder et Antoine Horion
 
 #include "Menu.h"
 #include "Game.h"
@@ -14,7 +14,6 @@
 
 // Inverse l'état du jeu
 void toggleRunning(Game* game) {
-
 	if (game->isRunning()) {
 		std::cout << "Game paused" << std::endl;
 		game->setRunning(false);
@@ -42,13 +41,12 @@ Menu::Menu(Game* game, Map* map, int uiWidth) : game_(game), map_(map), uiWidth_
 	}
 	createButtons();
 
-	// Affichage des commandes dans la console
 }
 
 void Menu::createButtons() {
 	// Créer les boutons avec leurs actions
 	/*
-	Rappel construction de Button :
+	Rappel constructeur Button :
 	Button(ButtonAction action,
 			int x, int y,
 			int width, int height,
@@ -59,8 +57,8 @@ void Menu::createButtons() {
 			sf::Color outlineColor,
 			std::vector<sf::Color> bgColor);
 	*/
-	int y = 10; // Position y de départ pour les boutons
 
+	int y = 10; // Position y de départ pour les boutons
 
 	Button button_toggle_running = Button(ButtonAction::ToggleRunning,
 		game_->getWidth() - uiWidth_ + 10, y,
@@ -98,7 +96,6 @@ void Menu::createButtons() {
 		sf::Color::White,
 		sf::Color::Black,
 		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
-
 	buttons_.push_back(Button(ButtonAction::IncreaseBrushRadius,
 		game_->getWidth() - uiWidth_ + uiWidth_/2 + 5, y,
 		uiWidth_/2 - 15, 30,
@@ -235,13 +232,14 @@ void Menu::drawUI(sf::RenderWindow& window) const {
 	rect_.setFillColor(sf::Color(50, 50, 50, 200));
 	window.draw(rect_);
 
-	// Dessiner chaque bouton
+	// Dessiner chaque bouton par dessus
 	for (auto button : buttons_) {
 		button.draw(window);
 	}
 }
 
 
+// Place un bloc de sable aléatoirement sur la carte
 void summonRandomSand(Map* map) {
 	int x = rand() % map->getWidth();
 	int y = rand() % map->getHeight();
@@ -250,7 +248,9 @@ void summonRandomSand(Map* map) {
 	}
 }
 
+// Place un poisson aléatoirement sur la carte
 void summonRandomFish(Map* map) {
+	// on essaye 100 cases max pour placer un poisson
 	for (int i = 0; i < 100; ++i) {
 		int x = rand() % map->getWidth();
 		int y = rand() % map->getHeight();
@@ -266,7 +266,7 @@ void summonRandomFish(Map* map) {
 	}
 }
 
-
+// Méthode pour gérer un evenement
 void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 
 	// Fermer le jeu
@@ -348,7 +348,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 	}
 
 
-	// 
+	// On commence à dessiner avec la souris
 	if (event.type == sf::Event::MouseButtonPressed) {
 		// Vérifier si le curseur est sur la carte
 		if (event.mouseButton.x < game_->getWidth() - uiWidth_ && state_ != MenuState::Idle) {
@@ -357,14 +357,15 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 		}
 	}
 	
-	// Déplacement de la souris
+	// Déplacement de la souris ==> on est peut etre en train de dessiner
 	if (event.type == sf::Event::MouseMoved) {
+
 		// Vérifier si le curseur est sur la carte
 		if (event.mouseMove.x < game_->getWidth() - uiWidth_ && isDrawingNow_) {
 			int x = event.mouseMove.x / map_->getBlockSize();
 			int y = event.mouseMove.y / map_->getBlockSize();
-
 			if (map_->inBounds(x, y)) {
+
 				switch (state_) {
 				case MenuState::EditingSand:
 					// Adapter à la taille du pinceau
@@ -430,14 +431,13 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 
 	// On relache le boutton de la souris
 	if (event.type == sf::Event::MouseButtonReleased) {
-		//std::cout << "Mouse button released at (" << event.mouseButton.x << ", " << event.mouseButton.y << ")" << std::endl;
 
 		// Vérifier si un bouton a été cliqué
 		for (auto& button : buttons_) {
 			if (button.contains(event.mouseButton.x, event.mouseButton.y)) {
 				ButtonAction action = button.getAction();
 
-				// Appeler la méthode correspondante
+				// Appeler la méthode correspondante à l'action du bouton
 				switch (action) {
 					case ButtonAction::ToggleRunning:
 						toggleRunning(game_);
@@ -507,6 +507,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 						// Effacer la carte
 						clearingMap();
 						break;
+
 					case ButtonAction::Quit:
 						std::cout << "Game closed" << std::endl;
 						game_->setRunning(false);
@@ -516,8 +517,8 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 			}
 		}
 
+		// On arrête de dessiner
 		if (isDrawingNow_) {
-			// On arrête de dessiner
 			isDrawingNow_ = false;
 		}
 	}
@@ -525,7 +526,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 
 // Fonction pour l'édition de sable
 void Menu::setEditingSand() {
-	Button* button = nullptr;
+	Button* button = nullptr; // Récuperer le bouton associé à l'action
 	for (auto& b : buttons_) {
 		if (b.getAction() == ButtonAction::AddSandBloc) {
 			button = &b;
@@ -553,7 +554,7 @@ void Menu::setEditingSand() {
 }
 
 void Menu::setEditingStone() {
-	Button* button = nullptr;
+	Button* button = nullptr; // Récuperer le bouton associé à l'action
 	for (auto& b : buttons_) {
 		if (b.getAction() == ButtonAction::AddStoneBloc) {
 			button = &b;
@@ -581,7 +582,7 @@ void Menu::setEditingStone() {
 }
 
 void Menu::setEditingMushroom() {
-	Button* button = nullptr;
+	Button* button = nullptr; // Récuperer le bouton associé à l'action
 	for (auto& b : buttons_) {
 		if (b.getAction() == ButtonAction::AddMushroomBloc) {
 			button = &b;
@@ -609,7 +610,7 @@ void Menu::setEditingMushroom() {
 }
 
 void Menu::setEditingWater() {
-	Button* button = nullptr;
+	Button* button = nullptr; // Récuperer le bouton associé à l'action
 	for (auto& b : buttons_) {
 		if (b.getAction() == ButtonAction::AddWaterBloc) {
 			button = &b;
@@ -637,7 +638,7 @@ void Menu::setEditingWater() {
 }
 
 void Menu::setRemovingBloc() {
-	Button* button = nullptr;
+	Button* button = nullptr; // Récuperer le bouton associé à l'action
 	for (auto& b : buttons_) {
 		if (b.getAction() == ButtonAction::RemoveBloc) {
 			button = &b;

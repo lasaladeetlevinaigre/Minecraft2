@@ -2,7 +2,7 @@
 // Auteur : Antoine Horion
 // Description :
 // Classe de base pour les blocs du jeu
-// Chaque bloc a une couleur, une position (x, y) et un type (pierre, sable, champignon)
+// Chaque bloc a une couleur, une position (x, y) et un type (pierre, sable, champignon,eau)
 // La classe est abstraite et doit être dérivée pour créer des blocs spécifiques
 
 
@@ -30,13 +30,10 @@ class Bloc {
 public:
 	// Constructeur
 	Bloc(int x, int y, BlocType type, sf::Color color) : color_(color), type_(type), x_(x), y_(y) {}
-	// Destructeur
-	virtual ~Bloc() {};
 
 	// Méthode virtuelle pure pour mettre à jour le bloc
 	virtual void update(Map* map) = 0;
 	
-	// Méthode pour dessiner le bloc
 	void setX(int x) { x_ = x; }
 	void setY(int y) { y_ = y; }
 	void setColor(sf::Color color) { color_ = color; }
@@ -44,14 +41,10 @@ public:
 	// Méthode pour afficher le bloc
 	void draw(sf::RenderWindow& window, int blockSize) const;
 
-	// Accesseurs
 	int getX() const { return x_; }
 	int getY() const { return y_; }
 	sf::Color getColor() const { return color_; }
 	BlocType getType() const { return type_; }
-
-
-
 };
 
 #endif // !BLOC_H

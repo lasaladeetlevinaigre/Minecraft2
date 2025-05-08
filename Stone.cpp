@@ -1,3 +1,5 @@
+// Stone.cpp
+// Auteur : Antoine horion
 #include "Stone.h"
 #include "Map.h"
 

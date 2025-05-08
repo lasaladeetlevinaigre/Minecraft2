@@ -1,3 +1,5 @@
+// Mushroom.cpp
+// Auteur : Antoine Horion
 #include "Mushroom.h"
 #include "Map.h"
 
@@ -7,7 +9,6 @@ Mushroom::Mushroom(int x, int y, int initialCooldown) : Bloc(x, y, MUSHROOM, sf:
     hooked_ = false;
 }
 void Mushroom::update(Map* map) {
-
     // Compte les nombre de voisins STONE
     int x = getX();
     int y = getY();
@@ -31,16 +32,16 @@ void Mushroom::update(Map* map) {
         hooked_ = true;
     }
 
-    //Comportement non accroch?
+    //Comportement non accroché
     if (hooked_ == false) {
         // Tombe si pas de voisin STONE et vide ou WATER en en dessous
-        Bloc* bellow = map->getBlock(x, y + 1);
-        if (stoneNeighbors == 0 && map->inBounds(x, y + 1) && (bellow == nullptr || (bellow && bellow->getType() == WATER))) {
+        Bloc* below = map->getBlock(x, y + 1);
+        if (stoneNeighbors == 0 && map->inBounds(x, y + 1) && (below == nullptr || (below && below->getType() == WATER))) {
             setY(y + 1);
         }
         map->setBlocInNextFrame(getX(), getY(), this);
     }
-    //Comportement accroch?
+    //Comportement accroché
     if (hooked_ == true) {
         if (stoneNeighbors > 0) {
             map->setBlocInNextFrame(getX(), getY(), this);
@@ -65,7 +66,7 @@ void Mushroom::update(Map* map) {
                     Bloc* adjacent = map->getBlock(nx, ny);
                     //Si le bloc adjaent est vide ou de l'eau
                     if (adjacent == nullptr || (adjacent && adjacent->getType() == WATER)) {
-                        // V?rifie s'il y a des blocs STONE autour de la case libre
+                        // Vérifie s'il y a des blocs STONE autour de la case libre
                         int stoneCount = 0;
                         for (int rx = -1; rx <= 1; rx++) {
                             for (int ry = -1; ry <= 1; ry++) {
@@ -89,10 +90,7 @@ void Mushroom::update(Map* map) {
             }
         }
     }
-
-
 }
-
 
 
 
