@@ -50,7 +50,7 @@ void Mushroom::update(Map* map) {
 
     //Propagation
     if (--spreadCooldown_ <= 0) {
-        spreadCooldown_ = 30;
+        spreadCooldown_ = initialCooldown_;
 
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {

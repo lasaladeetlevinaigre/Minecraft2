@@ -46,6 +46,7 @@ private:
 
 	bool isDrawingNow_;
 	int brushRadius_;
+    int mushroomCD_;
 
 public:
 	// Constructeur

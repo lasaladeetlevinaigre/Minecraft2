@@ -30,6 +30,7 @@ Menu::Menu(Game* game, Map* map, int uiWidth) : game_(game), map_(map), uiWidth_
 	state_ = MenuState::Idle;
 	isDrawingNow_ = false;
 	brushRadius_ = 1;
+	mushroomCD_ = 30;
 
 	// Initialiser la largeur de l'interface utilisateur
 	uiWidth_ = uiWidth;
@@ -74,7 +75,7 @@ void Menu::createButtons() {
 	y += 40; // Espace entre les boutons
 
 
-	buttons_.push_back(Button(ButtonAction::None,
+	buttons_.push_back(Button(ButtonAction::ShowBrushSize,
 		game_->getWidth() - uiWidth_ + 10, y,
 		uiWidth_ - 20, 30,
 		"Brush size: 2",
@@ -100,6 +101,41 @@ void Menu::createButtons() {
 	buttons_.push_back(Button(ButtonAction::IncreaseBrushRadius,
 		game_->getWidth() - uiWidth_ + uiWidth_/2 + 5, y,
 		uiWidth_/2 - 15, 30,
+		"Increase",
+		font_,
+		18,
+		sf::Color::White,
+		sf::Color::Black,
+		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
+	y += 40;
+
+	// Affichage actuel du cooldown du champignon 
+	buttons_.push_back(Button(ButtonAction::ShowMushroomCooldown,
+		game_->getWidth() - uiWidth_ + 10, y,
+		uiWidth_ - 20, 30,
+		"Mushroom cooldown: " + std::to_string(mushroomCD_),
+		font_,
+		18,
+		sf::Color::White,
+		sf::Color(50, 50, 50, 200),
+		std::vector<sf::Color>{ sf::Color(50, 50, 50, 200), sf::Color(50, 50, 50, 200) }));
+	y += 40;
+
+	// Bouton pour diminuer le cooldown
+	buttons_.push_back(Button(ButtonAction::DecreaseMushroomCD,
+		game_->getWidth() - uiWidth_ + 10, y,
+		uiWidth_ / 2 - 15, 30,
+		"Decrease",
+		font_,
+		18,
+		sf::Color::White,
+		sf::Color::Black,
+		std::vector<sf::Color>{ sf::Color(80, 80, 80), sf::Color(150, 150, 150) }));
+
+	// Bouton pour augmenter le cooldown
+	buttons_.push_back(Button(ButtonAction::IncreaseMushroomCD,
+		game_->getWidth() - uiWidth_ + uiWidth_ / 2 + 5, y,
+		uiWidth_ / 2 - 15, 30,
 		"Increase",
 		font_,
 		18,
@@ -276,14 +312,14 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 		if (brushRadius_ < 9)
 			brushRadius_++;
 		for (auto& b : buttons_)
-			if (b.getAction() == ButtonAction::None)
+			if (b.getAction() == ButtonAction::ShowBrushSize)
 				b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
 	}
 	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract) {
 		if (brushRadius_ > 0)
 			brushRadius_--;
 		for (auto& b : buttons_)
-			if (b.getAction() == ButtonAction::None)
+			if (b.getAction() == ButtonAction::ShowBrushSize)
 				b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
 	}
 
@@ -333,7 +369,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 					for (int i = -brushRadius_; i <= brushRadius_; ++i) {
 						for (int j = -brushRadius_; j <= brushRadius_; ++j) {
 							if (map_->inBounds(x + i, y + j)) {
-								map_->setBlocInCurrentFrame(x + i, y + j, new Mushroom(x + i, y + j, 15));
+								map_->setBlocInCurrentFrame(x + i, y + j, new Mushroom(x + i, y + j, mushroomCD_));
 							}
 						}
 					}
@@ -413,7 +449,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 						if (brushRadius_ < 9)
 							brushRadius_++;
 						for (auto& b : buttons_)
-							if (b.getAction() == ButtonAction::None)
+							if (b.getAction() == ButtonAction::ShowBrushSize)
 								b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
 
 						break;
@@ -422,9 +458,28 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 						if (brushRadius_ > 0)
 							brushRadius_--;
 						for (auto& b : buttons_)
-							if (b.getAction() == ButtonAction::None)
+							if (b.getAction() == ButtonAction::ShowBrushSize)
 								b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
 						break;
+
+					//Changer le cooldown des champignons
+					case ButtonAction::IncreaseMushroomCD:
+						mushroomCD_++;
+						for (auto& b : buttons_) {
+							if (b.getAction() == ButtonAction::ShowMushroomCooldown)
+								b.setText("Mushroom cooldown: " + std::to_string(mushroomCD_));
+						}
+						break;
+					case ButtonAction::DecreaseMushroomCD:
+						if (mushroomCD_ > 1)
+							mushroomCD_--;
+						for (auto& b : buttons_) {
+							if (b.getAction() == ButtonAction::ShowMushroomCooldown)
+								b.setText("Mushroom cooldown: " + std::to_string(mushroomCD_));
+						}
+						break;
+
+
 					case ButtonAction::ClearMap:
 						// Effacer la carte
 						clearingMap();
