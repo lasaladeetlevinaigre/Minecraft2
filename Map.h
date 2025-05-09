@@ -28,6 +28,7 @@ private:
 
 	int nbWaterBloc_;
 	std::vector<Fish *> fishes_;
+	int maxFishCount_;
 
 public:
 	// Constructeur et destructeur
@@ -53,6 +54,10 @@ public:
 	int getWidth() const { return width_; }
 	int getHeight() const { return height_; }
 	int getBlockSize() const { return blockSize_; }
+	int getNbWaterBloc() const { return nbWaterBloc_; }
+	int getMaxFishCount() const { return maxFishCount_; }
+
+	std::vector<Fish*> getFishes() const { return fishes_; }
 };
 
 

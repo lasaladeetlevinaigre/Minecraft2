@@ -32,6 +32,12 @@ Menu::Menu(Game* game, Map* map, int uiWidth) : game_(game), map_(map), uiWidth_
 	brushRadius_ = 1;
 	mushroomCD_ = 30;
 
+	// Initialiser le carré de prévisualisation
+	previewBox_.setSize(sf::Vector2f(0, 0));
+	previewBox_.setFillColor(sf::Color::Transparent);
+	previewBox_.setOutlineThickness(1.0f);
+	previewBox_.setOutlineColor(sf::Color::White);
+
 	// Initialiser la largeur de l'interface utilisateur
 	uiWidth_ = uiWidth;
 
@@ -236,8 +242,9 @@ void Menu::drawUI(sf::RenderWindow& window) const {
 	for (auto button : buttons_) {
 		button.draw(window);
 	}
+	if(state_ != MenuState::Idle)
+		window.draw(previewBox_);
 }
-
 
 // Place un bloc de sable aléatoirement sur la carte
 void summonRandomSand(Map* map) {
@@ -332,16 +339,19 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 	
 
 	// Modifier la taille de la brosse avec + et -
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Add) {
+	if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Add || event.key.code == sf::Keyboard::Equal)) {
 		if (brushRadius_ < 9)
 			brushRadius_++;
+		updateBrushPreview(window);
+
 		for (auto& b : buttons_)
 			if (b.getAction() == ButtonAction::ShowBrushSize)
 				b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
 	}
-	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Subtract) {
+	if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Subtract || event.key.code == sf::Keyboard::Dash)) {
 		if (brushRadius_ > 0)
 			brushRadius_--;
+		updateBrushPreview(window);
 		for (auto& b : buttons_)
 			if (b.getAction() == ButtonAction::ShowBrushSize)
 				b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
@@ -360,7 +370,10 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 	// Déplacement de la souris ==> on est peut etre en train de dessiner
 	if (event.type == sf::Event::MouseMoved) {
 
-		// Vérifier si le curseur est sur la carte
+		// Mettre àjour le carré de prévisualisation
+		updateBrushPreview(window);
+
+		// Vérifier si le curseur est sur la carte et que l'on est en train de dessiner
 		if (event.mouseMove.x < game_->getWidth() - uiWidth_ && isDrawingNow_) {
 			int x = event.mouseMove.x / map_->getBlockSize();
 			int y = event.mouseMove.y / map_->getBlockSize();
@@ -472,6 +485,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 						// Augmenter le rayon du pinceau
 						if (brushRadius_ < 9)
 							brushRadius_++;
+						updateBrushPreview(window);
 						for (auto& b : buttons_)
 							if (b.getAction() == ButtonAction::ShowBrushSize)
 								b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
@@ -481,6 +495,7 @@ void Menu::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 						// Diminuer le rayon du pinceau
 						if (brushRadius_ > 0)
 							brushRadius_--;
+						updateBrushPreview(window);
 						for (auto& b : buttons_)
 							if (b.getAction() == ButtonAction::ShowBrushSize)
 								b.setText("Brush size: " + std::to_string(brushRadius_ * 2 + 1));
@@ -674,5 +689,22 @@ void Menu::clearingMap() {
 	for (auto& b : buttons_) {
 		if (b.getAction() != ButtonAction::ToggleRunning)
 			b.setSelected(false);
+	}
+}
+
+void Menu::updateBrushPreview(sf::RenderWindow& window) {
+	sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+	if (mousePos.x < game_->getWidth() - uiWidth_ && state_ != MenuState::Idle) {
+		// Mettre à jour la position du carré
+		int x = mousePos.x / map_->getBlockSize();
+		int y = mousePos.y / map_->getBlockSize();
+		if (map_->inBounds(x, y)) {
+			previewBox_.setSize(sf::Vector2f((brushRadius_ * 2 + 1) * map_->getBlockSize(), (brushRadius_ * 2 + 1) * map_->getBlockSize()));
+			previewBox_.setPosition((x - brushRadius_) * map_->getBlockSize(), (y - brushRadius_) * map_->getBlockSize());
+			previewBox_.setFillColor(sf::Color::Transparent);
+			previewBox_.setOutlineThickness(1.0f);
+			previewBox_.setOutlineColor(sf::Color::White);
+		}
 	}
 }

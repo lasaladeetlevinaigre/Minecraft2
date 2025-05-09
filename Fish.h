@@ -19,8 +19,13 @@ class Fish {
     int direction_; // -1: gauche, 1: droite
     int changeDirCooldown_; // temps avant de pouvoir changer de direction
     int swimCooldown_; // temps avant de se deplacer
-    int timeLeftToLive_;
+
     int flashCooldown_; // permet de gerer le clignotement lorsque le poisson suffoque
+    int timeLeftToLive_;
+
+    unsigned int age_;
+    int reproductionCooldown_;
+    int staringMateSince_; // avant de se reproduire, on reste statique à coté du partenaire qqs instants
     bool isAlive_;
 
 public:
@@ -28,6 +33,20 @@ public:
 	void update(Map* map);
 	void draw(sf::RenderWindow& window, int blockSize) const;
     bool isAlive() const { return isAlive_; }
+
+    unsigned int getAge() const { return age_; }
+    int getX() const { return x_; }
+    int getY() const { return y_; }
+
+    sf::Color getInitialColor() const { return initialColor_; }
+
+    void setColor(sf::Color color) { color_ = color; }
+
+    int staringMateSince() const { return staringMateSince_; }
+    void setStaringTime(int st) { staringMateSince_ = st; }
+
+    int getReproductionCooldown() const { return reproductionCooldown_; }
+    void setReproductionCooldown(int cd) { reproductionCooldown_ = cd; }
 
 };
 

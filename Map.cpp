@@ -8,7 +8,7 @@
 
 // Initialisation de la grille
 Map::Map(int screenWidth, int screenHeight, int blockSize)
-	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize), nbWaterBloc_(0) {
+	: width_(screenWidth / blockSize), height_(screenHeight / blockSize), blockSize_(blockSize), nbWaterBloc_(0), maxFishCount_(0){
 
 	std::cout << "Map dimensions : " << width_ << " x " << height_ << std::endl;
 	currentGrid_.resize(height_, std::vector<Bloc*>(width_, nullptr));
@@ -48,7 +48,7 @@ void Map::update() {
 	// On met à jour les blocs d'eau dans un second temps
 	// Régulation de l'apparition de poissons
 	int nombre_water_bloc = nbWaterBloc_;
-	int maxFishCount = nombre_water_bloc / 100; // 1 poisson pour 100 blocs d'eau MAX
+	maxFishCount_ = nombre_water_bloc / 250; // 1 poisson pour 250 blocs d'eau MAX
 
 	nbWaterBloc_ = 0;
 	for (int y = height_ - 1; y >= 0; --y) {
@@ -58,7 +58,7 @@ void Map::update() {
 				nbWaterBloc_++;
 
 				// on limite l'apparition spontannée de poissons
-				if (fishes_.size() < maxFishCount && rand() % 500000 == 0) { // 0.0002% chance de spawn à chaque frame
+				if (fishes_.size() < maxFishCount_ && rand() % 500000 == 0) { // 0.0002% chance de spawn à chaque frame
 					addFish(new Fish(x, y, "Steve", sf::Color(255, 140, 60, 255)));
 				}
 			}

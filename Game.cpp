@@ -54,8 +54,8 @@ void Game::run()
 
 		// Gère le rendu des elements
 		window_.clear(sf::Color::Black);
-		menu_.drawUI(window_);
 		map_.draw(window_);
+		menu_.drawUI(window_);
 		window_.display();
 	}
 }

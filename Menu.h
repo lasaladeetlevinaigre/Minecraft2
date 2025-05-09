@@ -48,9 +48,13 @@ private:
 
     void clearingMap(); // Pour réinitialiser toute la carte et le menu
 
+    void updateBrushPreview(sf::RenderWindow& window);
+
 	bool isDrawingNow_;
 	int brushRadius_;
     int mushroomCD_; // Contrôle le CoolDown des Mushroom placés
+
+    sf::RectangleShape previewBox_;
 
 public:
 	// Constructeur
